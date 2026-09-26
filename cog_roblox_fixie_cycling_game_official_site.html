@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="site-title-tag">COG - Roblox Fixie Cycling Experience</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        theme: {
+                            accent: '#ccff00',
+                            accentHover: '#b3e600',
+                            glow: 'rgba(204, 255, 0, 0.25)'
+                        },
+                        neon: {
+                            dark: '#0a0c10',
+                            card: '#121620',
+                            cardHover: '#181d2a',
+                            border: '#1f2636'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+                        heading: ['Black Han Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --accent-color: #ccff00;
+        }
+        body {
+            background-color: #0a0c10;
+            color: #f1f5f9;
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            overflow-x: hidden;
+        }
+        .theme-accent-text { color: var(--accent-color); }
+        .theme-accent-bg { background-color: var(--accent-color); }
+        .theme-accent-border { border-color: var(--accent-color); }
+        
+        .bg-grid-pattern {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0c10; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
+        
+        @keyframes modalShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake { animation: modalShake 0.35s cubic-bezier(.36,.07,.19,.97) both; }
+        
+        .glass-panel {
+            background: rgba(18, 22, 32, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-neon-dark text-slate-100 antialiased selection:bg-lime-400 selection:text-black flex flex-col min-h-screen">
+
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 w-full z-40 bg-neon-dark/90 backdrop-blur-md border-b border-neon-border transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <button onclick="switchPage('home')" class="flex items-center gap-3 group text-left">
+                <div class="w-11 h-11 rounded-xl theme-accent-bg text-black flex items-center justify-center font-black text-2xl font-heading shadow-lg shadow-lime-500/10 transform group-hover:rotate-6 transition-transform">
+                    C
+                </div>
+                <div>
+                    <span id="nav-brand-title" class="text-2xl font-black tracking-widest font-heading text-white group-hover:opacity-90 transition-opacity">COG</span>
+                    <span class="block text-[10px] font-bold text-slate-400 tracking-wider">ROBLOX FIXIE CYCLING</span>
+                </div>
+            </button>
+
+            <!-- Desktop Navigation Tabs -->
+            <nav class="hidden lg:flex items-center gap-1 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800/80 font-bold text-xs">
+                <button onclick="switchPage('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-xl transition-all">🏠 메인</button>
+                <button onclick="switchPage('commands')" id="nav-commands" class="nav-btn px-4 py-2 rounded-xl text-slate-400 hover:text-white transition-all">🎮 조작법 가이드</button>
+                <button onclick="switchPage('gallery')" id="nav-gallery" class="nav-btn px-4 py-2 rounded-xl text-slate-400 hover:text-white transition-all">🖼️ 유저 갤러리</button>
+                <button onclick="switchPage('support')" id="nav-support" class="nav-btn px-4 py-2 rounded-xl text-slate-400 hover:text-white transition-all">💬 1:1 문의하기</button>
+                <button onclick="attemptAdminAccess()" id="nav-admin" class="nav-btn px-4 py-2 rounded-xl text-slate-400 hover:text-amber-400 transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-lock text-xs" id="admin-nav-icon"></i> ⚙️ 관리자
+                </button>
+            </nav>
+
+            <!-- Discord Button -->
+            <div class="hidden sm:flex items-center gap-3">
+                <a id="header-dc-btn" href="https://discord.gg/6jfvChash6" target="_blank" 
+                   class="px-5 py-2.5 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-indigo-500/20 transition-all hover:scale-105">
+                    <i class="fa-brands fa-discord text-base"></i>
+                    <span>디스코드</span>
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="lg:hidden text-2xl text-slate-300 hover:text-white p-2">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-neon-card border-b border-neon-border px-6 py-6 space-y-3 font-bold text-sm">
+            <button onclick="switchPage('home'); closeMobileMenu();" class="block w-full text-left py-2 text-slate-200">🏠 메인</button>
+            <button onclick="switchPage('commands'); closeMobileMenu();" class="block w-full text-left py-2 text-slate-200">🎮 조작법 가이드</button>
+            <button onclick="switchPage('gallery'); closeMobileMenu();" class="block w-full text-left py-2 text-slate-200">🖼️ 유저 갤러리</button>
+            <button onclick="switchPage('support'); closeMobileMenu();" class="block w-full text-left py-2 text-slate-200">💬 1:1 문의하기</button>
+            <button onclick="attemptAdminAccess(); closeMobileMenu();" class="block w-full text-left py-2 text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-lock text-xs"></i> ⚙️ 관리자 설정
+            </button>
+            <div class="pt-3 border-t border-slate-800">
+                <a id="mobile-dc-btn" href="https://discord.gg/6jfvChash6" target="_blank" class="w-full py-3 rounded-xl bg-[#5865F2] text-center font-bold text-xs flex items-center justify-center gap-2 text-white">
+                    <i class="fa-brands fa-discord text-sm"></i> 공식 디스코드 서버
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Admin Auth Modal -->
+    <div id="admin-auth-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div id="auth-modal-card" class="bg-neon-card border border-neon-border w-full max-w-md rounded-2xl p-6 sm:p-8 shadow-2xl relative">
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center space-y-3 mb-6">
+                <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl mx-auto">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3 class="text-2xl font-black font-heading text-white">관리자 전용 인증</h3>
+                <p class="text-slate-400 text-xs">설정 및 수신함 관리 권한을 얻으려면 암호를 입력하세요.</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">비밀번호</label>
+                    <div class="relative">
+                        <input type="password" id="admin-pass-input" placeholder="비밀번호 입력..." required
+                               class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400">
+                        <i class="fa-solid fa-key absolute right-4 top-3.5 text-slate-600 text-sm"></i>
+                    </div>
+                </div>
+
+                <div id="auth-error-msg" class="hidden text-red-400 text-xs font-semibold text-center bg-red-950/40 border border-red-800/50 p-2.5 rounded-lg">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> 비밀번호가 올바르지 않습니다!
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-sm shadow-lg transition-all">
+                    관리자 로그인
+                </button>
+
+                <p class="text-center text-[11px] text-slate-500">기본 접속 비밀번호: <code class="text-amber-400 font-mono">cog2026</code></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTENT -->
+    <main class="flex-grow pt-24 pb-16">
+
+        <!-- PAGE 1: HOME -->
+        <section id="page-home" class="page-content">
+            <!-- Hero -->
+            <div class="relative py-12 md:py-20 bg-grid-pattern overflow-hidden">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                        <div class="lg:col-span-7 text-center lg:text-left space-y-6">
+                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 text-xs font-bold text-slate-300">
+                                <span class="w-2 h-2 rounded-full theme-accent-bg animate-ping"></span>
+                                ROBLOX FIXIE CYCLING OFFICIAL
+                            </div>
+
+                            <h1 id="hero-main-title" class="text-4xl sm:text-6xl font-black font-heading tracking-tight leading-tight text-white">
+                                FEEL THE STREET,<br>
+                                <span class="theme-accent-text">MASTER THE FIXIE</span>
+                            </h1>
+
+                            <p id="hero-sub-desc" class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                                로블록스 COG에서 리얼한 픽시 자전거 라이딩과 크루 배달을 즐겨보세요! 공식 디스코드 커뮤니티에서 라이더들과 소통할 수 있습니다.
+                            </p>
+
+                            <div class="flex flex-wrap justify-center lg:justify-start gap-4 pt-2">
+                                <a id="hero-dc-btn" href="https://discord.gg/6jfvChash6" target="_blank" 
+                                   class="px-7 py-3.5 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white font-extrabold text-sm flex items-center gap-2.5 shadow-xl shadow-indigo-500/20 transition-all hover:-translate-y-0.5">
+                                    <i class="fa-brands fa-discord text-lg"></i>
+                                    <span>공식 디스코드 입장</span>
+                                </a>
+                                <button onclick="switchPage('commands')" class="px-7 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-sm border border-slate-700 transition-all hover:-translate-y-0.5">
+                                    <i class="fa-solid fa-gamepad mr-2 theme-accent-text"></i>기기별 조작법 보기
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Bike Custom Simulator -->
+                        <div class="lg:col-span-5">
+                            <div class="bg-neon-card rounded-2xl border border-neon-border p-6 shadow-2xl relative">
+                                <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+                                    <span class="text-xs font-mono theme-accent-text font-bold"><i class="fa-solid fa-bicycle mr-1.5"></i> VIRTUAL FIXIE BUILDER</span>
+                                    <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">3D SIMULATOR</span>
+                                </div>
+
+                                <div id="bike-display" class="my-6 h-56 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center relative overflow-hidden">
+                                    <svg class="w-48 h-48 theme-accent-text transition-all duration-300" id="bike-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path id="bike-frame" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 6h2.5l1.5 4M15 6L9 17.5M15 6l-6-3.5M5.5 17.5L9 11l4.5 1M9 11L7 6h2"/>
+                                        <circle id="bike-wheel-f" cx="18.5" cy="17.5" r="3.5" stroke-width="1.8"/>
+                                        <circle id="bike-wheel-r" cx="5.5" cy="17.5" r="3.5" stroke-width="1.8"/>
+                                    </svg>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <span class="text-[11px] font-bold text-slate-400 block">프레임 네온 커스텀</span>
+                                    <div class="flex gap-2">
+                                        <button onclick="changeCustomColor('#ccff00')" class="w-8 h-8 rounded-lg bg-[#ccff00] border border-white/20 hover:scale-110 transition-transform"></button>
+                                        <button onclick="changeCustomColor('#00f0ff')" class="w-8 h-8 rounded-lg bg-[#00f0ff] border border-white/20 hover:scale-110 transition-transform"></button>
+                                        <button onclick="changeCustomColor('#b026ff')" class="w-8 h-8 rounded-lg bg-[#b026ff] border border-white/20 hover:scale-110 transition-transform"></button>
+                                        <button onclick="changeCustomColor('#ff0055')" class="w-8 h-8 rounded-lg bg-[#ff0055] border border-white/20 hover:scale-110 transition-transform"></button>
+                                        <button onclick="changeCustomColor('#ffffff')" class="w-8 h-8 rounded-lg bg-white border border-white/20 hover:scale-110 transition-transform"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Notices Section -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-black font-heading text-white flex items-center gap-2">
+                        <i class="fa-solid fa-bullhorn theme-accent-text"></i> 최근 공지사항
+                    </h2>
+                    <span class="text-xs text-slate-400">실시간 패치노트</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="home-announcements-list">
+                    <!-- Dynamic Announcements -->
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 2: CONTROLS & GUIDE -->
+        <section id="page-commands" class="page-content hidden">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                
+                <div class="text-center max-w-3xl mx-auto space-y-3">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 text-xs font-bold text-slate-300">
+                        <i class="fa-solid fa-gamepad theme-accent-text"></i> ROBLOX COG CONTROLS
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-black font-heading text-white">로블록스 코그 조작법 안내</h2>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        코그(COG)는 자전거를 타고 배달과 화려한 트릭을 즐기는 게임입니다.<br class="hidden sm:inline"> PC, 콘솔, 모바일 각 기기별 맞춤 조작 키를 확인하세요.
+                    </p>
+                </div>
+
+                <!-- Device Selector Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <!-- PC Controls -->
+                    <div class="bg-neon-card rounded-2xl border border-neon-border p-6 relative overflow-hidden shadow-xl">
+                        <div class="flex items-center gap-3 border-b border-slate-800 pb-4 mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-desktop"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-lg">PC 조작법</h3>
+                                <span class="text-[11px] text-slate-400">키보드 및 마우스</span>
+                            </div>
+                        </div>
+
+                        <ul class="space-y-3 text-xs">
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">이동</span>
+                                <span class="font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">W / A / S / D</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">자전거 점프</span>
+                                <span class="font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">H</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">트릭 (피쉬 앤 칩스)</span>
+                                <span class="font-mono font-bold text-blue-400 bg-slate-800 px-2 py-0.5 rounded">Z</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">트릭 (와일리)</span>
+                                <span class="font-mono font-bold text-blue-400 bg-slate-800 px-2 py-0.5 rounded">X</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">스탠드</span>
+                                <span class="font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">C</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">바디 뷰 시점</span>
+                                <span class="font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">V</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">슬라이드</span>
+                                <span class="font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">LSHIFT</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">스프링 / 스프린트</span>
+                                <span class="font-mono font-bold text-emerald-400 bg-slate-800 px-2 py-0.5 rounded">LCTRL (길게)</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Console Controls -->
+                    <div class="bg-neon-card rounded-2xl border border-neon-border p-6 relative overflow-hidden shadow-xl">
+                        <div class="flex items-center gap-3 border-b border-slate-800 pb-4 mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-lg">콘솔 조작법</h3>
+                                <span class="text-[11px] text-slate-400">Xbox / PlayStation</span>
+                            </div>
+                        </div>
+
+                        <ul class="space-y-3 text-xs">
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">페달 (가속)</span>
+                                <span class="font-mono font-bold text-purple-400 bg-slate-800 px-2 py-0.5 rounded">R1 버튼</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">브레이크</span>
+                                <span class="font-mono font-bold text-purple-400 bg-slate-800 px-2 py-0.5 rounded">L1 버튼</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">조향 (방향 전환)</span>
+                                <span class="font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">좌측 조이스틱</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">트릭 (피쉬 앤 칩스)</span>
+                                <span class="font-mono font-bold text-purple-400 bg-slate-800 px-2 py-0.5 rounded">X 버튼</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">점프</span>
+                                <span class="font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">점프 버튼 (뛰기)</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">스탠드</span>
+                                <span class="font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">B 버튼</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Mobile Controls -->
+                    <div class="bg-neon-card rounded-2xl border border-neon-border p-6 relative overflow-hidden shadow-xl">
+                        <div class="flex items-center gap-3 border-b border-slate-800 pb-4 mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-lg">모바일/태블릿</h3>
+                                <span class="text-[11px] text-slate-400">터치 화면 조작</span>
+                            </div>
+                        </div>
+
+                        <ul class="space-y-3 text-xs">
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">이동</span>
+                                <span class="font-mono font-bold text-emerald-400 bg-slate-800 px-2 py-0.5 rounded">좌측 원형 조이스틱</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">시점 전환</span>
+                                <span class="font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">빈 화면 밀기</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">점프</span>
+                                <span class="font-mono font-bold text-emerald-400 bg-slate-800 px-2 py-0.5 rounded">우측하단 위 화살표</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800">
+                                <span class="text-slate-400">화면 확대 / 축소</span>
+                                <span class="font-mono font-bold text-white bg-slate-800 px-2 py-0.5 rounded">두 손가락 오므리기/펼치기</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 3: PUBLIC GALLERY -->
+        <section id="page-gallery" class="page-content hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                    <div>
+                        <h2 class="text-3xl font-black font-heading text-white">유저 라이딩 갤러리</h2>
+                        <p class="text-slate-400 text-xs mt-1">COG 라이더들의 픽시 자전거 인증샷과 스크린샷을 자유롭게 공유하세요!</p>
+                    </div>
+
+                    <button onclick="openUploadModal()" class="px-5 py-3 rounded-xl theme-accent-bg text-black font-extrabold text-xs flex items-center gap-2 shadow-lg hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+                        <span>내 픽시 사진 등록하기</span>
+                    </button>
+                </div>
+
+                <!-- Gallery Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="gallery-cards-grid">
+                    <!-- Dynamic Gallery Rendering -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Upload Image Modal -->
+        <div id="upload-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+            <div class="bg-neon-card border border-neon-border w-full max-w-lg rounded-2xl p-6 shadow-2xl relative">
+                <button onclick="closeUploadModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <h3 class="text-2xl font-black font-heading text-white mb-4">갤러리 사진 업로드</h3>
+
+                <form onsubmit="handleGalleryUpload(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">작성자 닉네임</label>
+                        <input type="text" id="up-author" placeholder="예: 라이더123" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">사진 제목</label>
+                        <input type="text" id="up-title" placeholder="예: 한강 스키딩 인증샷" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">이미지 파일 선택 또는 URL</label>
+                        <input type="file" id="up-file" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-800 file:text-white mb-2">
+                        <span class="text-[11px] text-slate-500 block text-center mb-1">- 또는 이미지 URL 입력 -</span>
+                        <input type="url" id="up-url" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 rounded-xl theme-accent-bg text-black font-black text-xs shadow-lg transition-transform hover:scale-[1.02]">
+                        갤러리에 게시하기
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- PAGE 4: SUPPORT / INQUIRY -->
+        <section id="page-support" class="page-content hidden">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                
+                <div class="text-center max-w-2xl mx-auto space-y-2">
+                    <h2 class="text-3xl font-black font-heading text-white">1:1 문의하기</h2>
+                    <p class="text-slate-400 text-xs">게임 버그 제보, 문의사항, 신고는 아래 양식을 통해 관리자에게 전송됩니다.</p>
+                </div>
+
+                <div class="bg-neon-card rounded-2xl border border-neon-border p-6 sm:p-8 shadow-xl">
+                    <form onsubmit="handleInquirySubmit(event)" class="space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">성함 / 로블록스 닉네임 *</label>
+                                <input type="text" id="inq-name" required placeholder="홍길동" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-lime-400">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">디스코드 태그 (선택)</label>
+                                <input type="text" id="inq-discord" placeholder="username#0000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-lime-400">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">문의 유형 *</label>
+                                <select id="inq-category" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-lime-400">
+                                    <option value="버그 제보">🐛 버그 제보</option>
+                                    <option value="게임 관련 문의">🎮 게임 관련 문의</option>
+                                    <option value="디스코드 서버 문의">💬 디스코드 서버 문의</option>
+                                    <option value="유저 신고">🚨 유저 신고</option>
+                                    <option value="기타">💡 기타 문의</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">제목 *</label>
+                                <input type="text" id="inq-title" required placeholder="문의 제목을 입력하세요" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-lime-400">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1">상세 문의 내용 *</label>
+                            <textarea id="inq-content" rows="5" required placeholder="발생한 상황이나 궁금하신 점을 상세히 적어주세요." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-white focus:outline-none focus:border-lime-400"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-4 rounded-xl theme-accent-bg text-black font-black text-sm shadow-lg hover:bg-lime-300 transition-colors">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> 관리자에게 문의 전송하기
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 5: ADMIN DASHBOARD (PROTECTED) -->
+        <section id="page-admin" class="page-content hidden">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                
+                <!-- Admin Top Card -->
+                <div class="bg-neon-card border border-amber-500/40 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black font-heading text-white">관리자 종합 대시보드</h2>
+                            <p class="text-slate-400 text-xs">문의사항 확인, 갤러리 이미지 관리, 사이트 문구 수정을 통합 관리합니다.</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="logoutAdmin()" class="px-4 py-2.5 rounded-xl bg-red-600/20 hover:bg-red-600 border border-red-500/40 text-red-300 hover:text-white font-bold text-xs flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+                    </button>
+                </div>
+
+                <!-- Admin Tabs -->
+                <div class="flex gap-2 border-b border-slate-800 pb-3 font-bold text-xs">
+                    <button onclick="switchAdminTab('inquiries')" id="admin-tab-btn-inquiries" class="px-4 py-2 rounded-xl bg-slate-800 text-white">
+                        📬 1:1 문의 수신함 (<span id="inquiry-count">0</span>)
+                    </button>
+                    <button onclick="switchAdminTab('settings')" id="admin-tab-btn-settings" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white">
+                        ⚙️ 사이트 설정
+                    </button>
+                </div>
+
+                <!-- Admin Tab 1: Inquiries Inbox -->
+                <div id="admin-tab-inquiries" class="space-y-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-inbox text-amber-400"></i> 유저 접수 문의 목록
+                    </h3>
+                    
+                    <div id="admin-inquiries-list" class="space-y-3">
+                        <!-- Dynamic Inquiries List -->
+                    </div>
+                </div>
+
+                <!-- Admin Tab 2: Site Settings -->
+                <div id="admin-tab-settings" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Text & Links -->
+                    <div class="bg-neon-card rounded-2xl border border-neon-border p-6 space-y-4">
+                        <h3 class="font-bold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders theme-accent-text"></i> 사이트 정보 수정
+                        </h3>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1">사이트 타이틀</label>
+                            <input type="text" id="admin-input-title" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1">메인 헤드라인</label>
+                            <input type="text" id="admin-input-hero" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1">디스코드 초대 링크</label>
+                            <input type="text" id="admin-input-discord" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white font-mono">
+                        </div>
+
+                        <button onclick="saveGeneralSettings()" class="w-full py-3 rounded-xl theme-accent-bg text-black font-black text-xs">
+                            설정 변경사항 저장
+                        </button>
+                    </div>
+
+                    <!-- Password Change & Color Theme -->
+                    <div class="bg-neon-card rounded-2xl border border-neon-border p-6 space-y-6">
+                        <div>
+                            <h3 class="font-bold text-white border-b border-slate-800 pb-3 flex items-center gap-2 mb-4">
+                                <i class="fa-solid fa-key text-amber-400"></i> 비밀번호 변경
+                            </h3>
+                            <div class="space-y-3">
+                                <input type="password" id="new-admin-pass" placeholder="새 관리자 비밀번호..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+                                <button onclick="changeAdminPassword()" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs">
+                                    비밀번호 업데이트
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-white border-b border-slate-800 pb-3 flex items-center gap-2 mb-3">
+                                <i class="fa-solid fa-palette text-cyan-400"></i> 포인트 컬러
+                            </h3>
+                            <div class="grid grid-cols-4 gap-2">
+                                <button onclick="setThemeAccent('#ccff00')" class="py-2 rounded-xl bg-[#ccff00] text-black font-bold text-xs">네온라임</button>
+                                <button onclick="setThemeAccent('#00f0ff')" class="py-2 rounded-xl bg-[#00f0ff] text-black font-bold text-xs">시안</button>
+                                <button onclick="setThemeAccent('#b026ff')" class="py-2 rounded-xl bg-[#b026ff] text-white font-bold text-xs">퍼플</button>
+                                <button onclick="setThemeAccent('#ff0055')" class="py-2 rounded-xl bg-[#ff0055] text-white font-bold text-xs">크림슨</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black py-8 border-t border-slate-800 text-slate-500 text-xs mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p>© 2026 COG Roblox Fixie Cycling Game. All rights reserved.</p>
+            <p class="text-[11px] text-slate-600">공식 디스코드 서버: <span id="footer-dc-txt" class="text-slate-400 font-mono">https://discord.gg/6jfvChash6</span></p>
+        </div>
+    </footer>
+
+    <script>
+        // DEFAULT DATA
+        const DEFAULT_CONFIG = {
+            title: "COG - Roblox Fixie Cycling",
+            heroTitle: "FEEL THE STREET, MASTER THE FIXIE",
+            discordUrl: "https://discord.gg/6jfvChash6",
+            accentColor: "#ccff00",
+            adminPass: "cog2026",
+            announcements: [
+                { id: 1, title: "COG 공식 웹사이트 정식 리뉴얼", desc: "조작법 가이드 및 1:1 문의 기능이 오픈되었습니다.", date: "2026-09-26" },
+                { id: 2, title: "v2.5 신규 픽시 스토어 파츠 추가", desc: "새로운 카본 프레임 및 스트리트 스키딩 모션을 확인하세요.", date: "2026-09-25" }
+            ],
+            gallery: [
+                { id: 101, author: "FixieRider", title: "야간 심야 스키딩", url: "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&w=800&q=80", date: "2026-09-26" },
+                { id: 102, author: "CarbonKing", title: "에어로 커스텀 픽시 빌드", url: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80", date: "2026-09-25" }
+            ],
+            inquiries: [
+                { id: 201, name: "라이더A", discord: "RiderA#1234", category: "게임 관련 문의", title: "트릭 포인트 획득 방식 질문", content: "와일리 완료 시 포인트 합산 방식이 궁금합니다.", status: "대기중", date: "2026-09-26" }
+            ]
+        };
+
+        function getConfig() {
+            const saved = localStorage.getItem('cog_full_config');
+            return saved ? JSON.parse(saved) : DEFAULT_CONFIG;
+        }
+
+        function saveConfig(cfg) {
+            localStorage.setItem('cog_full_config', JSON.stringify(cfg));
+            applyConfig();
+        }
+
+        function applyConfig() {
+            const cfg = getConfig();
+
+            // Text and Titles
+            document.getElementById('site-title-tag').innerText = cfg.title;
+            document.getElementById('nav-brand-title').innerText = cfg.title.split('-')[0].trim();
+            document.getElementById('hero-main-title').innerHTML = cfg.heroTitle.replace(',', '<br>');
+
+            // Discord Link Updates
+            const dcLinks = ['header-dc-btn', 'mobile-dc-btn', 'hero-dc-btn', 'footer-dc-txt'];
+            dcLinks.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el.tagName === 'A') el.href = cfg.discordUrl;
+                    else el.innerText = cfg.discordUrl;
+                }
+            });
+
+            // Accent Color
+            document.documentElement.style.setProperty('--accent-color', cfg.accentColor);
+
+            // Sync Inputs
+            document.getElementById('admin-input-title').value = cfg.title;
+            document.getElementById('admin-input-hero').value = cfg.heroTitle;
+            document.getElementById('admin-input-discord').value = cfg.discordUrl;
+
+            // Render Dynamic Components
+            renderAnnouncements(cfg.announcements);
+            renderGallery(cfg.gallery);
+            renderInquiries(cfg.inquiries);
+        }
+
+        // Render Announcements
+        function renderAnnouncements(list) {
+            const homeList = document.getElementById('home-announcements-list');
+            homeList.innerHTML = list.map(item => `
+                <div class="bg-neon-card p-5 rounded-2xl border border-neon-border shadow-md">
+                    <span class="text-[10px] font-mono theme-accent-text font-bold">${item.date}</span>
+                    <h4 class="font-bold text-white text-base mt-1">${item.title}</h4>
+                    <p class="text-slate-400 text-xs mt-2 leading-relaxed">${item.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        // Render Public Gallery
+        function renderGallery(galleryList) {
+            const grid = document.getElementById('gallery-cards-grid');
+            const isAdmin = sessionStorage.getItem('cog_admin_authed') === 'true';
+
+            if (galleryList.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-sm">등록된 사진이 없습니다. 첫 사진을 업로드해보세요!</div>`;
+                return;
+            }
+
+            grid.innerHTML = galleryList.map(item => `
+                <div class="bg-neon-card rounded-2xl border border-neon-border overflow-hidden shadow-lg group relative">
+                    <img src="${item.url}" alt="${item.title}" class="w-full h-52 object-cover group-hover:scale-105 transition-transform" onerror="this.src='https://placehold.co/800x600/121620/ffffff?text=Image+Load+Error'">
+                    <div class="p-4 space-y-1">
+                        <div class="flex justify-between items-center text-[10px] text-slate-400">
+                            <span>👤 ${item.author}</span>
+                            <span>${item.date}</span>
+                        </div>
+                        <h4 class="font-bold text-white text-base">${item.title}</h4>
+                    </div>
+                    ${isAdmin ? `
+                        <button onclick="deleteGalleryItem(${item.id})" class="absolute top-3 right-3 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2.5 py-1 rounded-lg font-bold shadow-md backdrop-blur-sm">
+                            <i class="fa-solid fa-trash mr-1"></i> 삭제
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Render Support Inquiries
+        function renderInquiries(inquiries) {
+            const listEl = document.getElementById('admin-inquiries-list');
+            document.getElementById('inquiry-count').innerText = inquiries.length;
+
+            if (inquiries.length === 0) {
+                listEl.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">접수된 문의사항이 없습니다.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = inquiries.map(item => `
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">${item.category}</span>
+                            <h4 class="font-bold text-white text-sm mt-1">${item.title}</h4>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono">${item.date}</span>
+                    </div>
+                    <p class="text-slate-300 text-xs bg-slate-900 p-3 rounded-lg leading-relaxed">${item.content}</p>
+                    <div class="flex justify-between items-center pt-2 text-[11px] text-slate-400 border-t border-slate-900">
+                        <span>보낸사람: <strong class="text-white">${item.name}</strong> (${item.discord || '디스코드 없음'})</span>
+                        <button onclick="deleteInquiry(${item.id})" class="text-red-400 hover:text-red-300 font-bold">문의 삭제</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Gallery Upload Modal Logic
+        function openUploadModal() {
+            document.getElementById('upload-modal').classList.remove('hidden');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('upload-modal').classList.add('hidden');
+        }
+
+        function handleGalleryUpload(e) {
+            e.preventDefault();
+            const author = document.getElementById('up-author').value.trim();
+            const title = document.getElementById('up-title').value.trim();
+            const fileInput = document.getElementById('up-file');
+            const urlInput = document.getElementById('up-url').value.trim();
+
+            const processUpload = (imageUrl) => {
+                const cfg = getConfig();
+                cfg.gallery.unshift({
+                    id: Date.now(),
+                    author,
+                    title,
+                    url: imageUrl,
+                    date: new Date().toISOString().split('T')[0]
+                });
+                saveConfig(cfg);
+                closeUploadModal();
+                alert('갤러리에 사진이 성공적으로 공유되었습니다!');
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    processUpload(evt.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else if (urlInput) {
+                processUpload(urlInput);
+            } else {
+                alert('이미지 파일 선택 또는 URL을 입력해주세요.');
+            }
+        }
+
+        function deleteGalleryItem(id) {
+            if (!confirm('이 갤러리 사진을 삭제하시겠습니까?')) return;
+            const cfg = getConfig();
+            cfg.gallery = cfg.gallery.filter(item => item.id !== id);
+            saveConfig(cfg);
+        }
+
+        // Inquiry Submit Form Handler
+        function handleInquirySubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('inq-name').value.trim();
+            const discord = document.getElementById('inq-discord').value.trim();
+            const category = document.getElementById('inq-category').value;
+            const title = document.getElementById('inq-title').value.trim();
+            const content = document.getElementById('inq-content').value.trim();
+
+            const cfg = getConfig();
+            cfg.inquiries.unshift({
+                id: Date.now(),
+                name,
+                discord,
+                category,
+                title,
+                content,
+                date: new Date().toISOString().split('T')[0]
+            });
+            saveConfig(cfg);
+
+            // Reset form
+            document.getElementById('inq-name').value = '';
+            document.getElementById('inq-discord').value = '';
+            document.getElementById('inq-title').value = '';
+            document.getElementById('inq-content').value = '';
+
+            alert('문의사항이 전송되었습니다! 관리자가 확인 후 응답할 예정입니다.');
+        }
+
+        function deleteInquiry(id) {
+            const cfg = getConfig();
+            cfg.inquiries = cfg.inquiries.filter(i => i.id !== id);
+            saveConfig(cfg);
+        }
+
+        // SPA Navigation Manager
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('theme-accent-bg', 'text-black');
+                btn.classList.add('text-slate-400');
+            });
+            const activeNav = document.getElementById(`nav-${pageId}`);
+            if (activeNav) {
+                activeNav.classList.remove('text-slate-400');
+                activeNav.classList.add('theme-accent-bg', 'text-black');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Admin Security Methods
+        function attemptAdminAccess() {
+            if (sessionStorage.getItem('cog_admin_authed') === 'true') {
+                switchPage('admin');
+            } else {
+                openAdminModal();
+            }
+        }
+
+        function openAdminModal() {
+            document.getElementById('admin-auth-modal').classList.remove('hidden');
+            document.getElementById('admin-pass-input').focus();
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-auth-modal').classList.add('hidden');
+            document.getElementById('auth-error-msg').classList.add('hidden');
+            document.getElementById('admin-pass-input').value = '';
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const inputPass = document.getElementById('admin-pass-input').value;
+            const cfg = getConfig();
+
+            if (inputPass === cfg.adminPass) {
+                sessionStorage.setItem('cog_admin_authed', 'true');
+                closeAdminModal();
+                updateAdminNavIcon(true);
+                applyConfig();
+                switchPage('admin');
+            } else {
+                const card = document.getElementById('auth-modal-card');
+                document.getElementById('auth-error-msg').classList.remove('hidden');
+                card.classList.add('animate-shake');
+                setTimeout(() => card.classList.remove('animate-shake'), 400);
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('cog_admin_authed');
+            updateAdminNavIcon(false);
+            applyConfig();
+            switchPage('home');
+        }
+
+        function updateAdminNavIcon(isAuthed) {
+            const icon = document.getElementById('admin-nav-icon');
+            if (isAuthed) {
+                icon.className = "fa-solid fa-lock-open text-xs text-amber-400";
+            } else {
+                icon.className = "fa-solid fa-lock text-xs";
+            }
+        }
+
+        function switchAdminTab(tab) {
+            document.getElementById('admin-tab-inquiries').classList.add('hidden');
+            document.getElementById('admin-tab-settings').classList.add('hidden');
+            document.getElementById(`admin-tab-${tab}`).classList.remove('hidden');
+
+            document.getElementById('admin-tab-btn-inquiries').className = "px-4 py-2 rounded-xl text-slate-400 hover:text-white";
+            document.getElementById('admin-tab-btn-settings').className = "px-4 py-2 rounded-xl text-slate-400 hover:text-white";
+            document.getElementById(`admin-tab-btn-${tab}`).className = "px-4 py-2 rounded-xl bg-slate-800 text-white font-bold";
+        }
+
+        function saveGeneralSettings() {
+            const cfg = getConfig();
+            cfg.title = document.getElementById('admin-input-title').value;
+            cfg.heroTitle = document.getElementById('admin-input-hero').value;
+            cfg.discordUrl = document.getElementById('admin-input-discord').value;
+            saveConfig(cfg);
+            alert('사이트 정보가 성공적으로 변경되었습니다.');
+        }
+
+        function changeAdminPassword() {
+            const newPass = document.getElementById('new-admin-pass').value.trim();
+            if (!newPass) return alert('비밀번호를 입력하세요.');
+            const cfg = getConfig();
+            cfg.adminPass = newPass;
+            saveConfig(cfg);
+            document.getElementById('new-admin-pass').value = '';
+            alert('관리자 비밀번호가 성공적으로 업데이트되었습니다!');
+        }
+
+        function setThemeAccent(hex) {
+            const cfg = getConfig();
+            cfg.accentColor = hex;
+            saveConfig(cfg);
+        }
+
+        function changeCustomColor(hex) {
+            document.getElementById('bike-svg').style.color = hex;
+        }
+
+        function closeMobileMenu() {
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Initialize application on load
+        window.onload = function() {
+            applyConfig();
+            switchPage('home');
+            if (sessionStorage.getItem('cog_admin_authed') === 'true') {
+                updateAdminNavIcon(true);
+            }
+        };
+    </script>
+</body>
+</html>
